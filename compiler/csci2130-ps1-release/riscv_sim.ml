@@ -120,16 +120,23 @@ let write_word_little_endian (m : memory) (addr : int32) (w : int32) : memory =
   let m3 = mem_update (Int32.add addr 3l) b3 m2 in
   m3;;
 
-let step_sw (i: reg * reg * int32) (m: memory) : memory =
+let step_sw (i: reg * reg * int32) (s: state) : memory =
   let (rs1, rs2, imm_s) = i in
-  let mem_addr = Int32.add (reg2ind32 rs1) imm_s in
-  write_word_little_endian m mem_addr (reg2ind32 rs2)
+  let m = s.m in
+  let old_reg_file = s.r in
+  let rs1_val = rf_lookup (reg2ind rs1) old_reg_file in
+  let rs2_val = rf_lookup (reg2ind rs2) old_reg_file in
+  let mem_addr = Int32.add rs1_val imm_s in
+  write_word_little_endian m mem_addr rs2_val
   (* mem_update mem_addr ({b= (reg2ind32 rs1)}) m *)
 
     (*later*)
-let step_lw (i: reg * reg * int32) (m: memory) : int32 =
+let step_lw (i: reg * reg * int32) (s: state) : int32 =
   let (_, rs1, imm_i) = i in
-  let mem_addr = Int32.add imm_i (reg2ind32 rs1) in
+  let m = s.m in
+  let old_reg_file = s.r in
+  let rs1_val = rf_lookup (reg2ind rs1) old_reg_file in
+  let mem_addr = Int32.add imm_i rs1_val in
   let mem_val = read_word_little_endian m mem_addr in
     mem_val;;
 
@@ -143,42 +150,56 @@ let step_lw (i: reg * reg * int32) (m: memory) : int32 =
     Int32.shift_left imm_u 12
 
 (*take a register and an offset, return a new register (rd) and a new pc*)
-let step_jalr (i: reg * reg * int32) (pc: int32) : int32 * int32 =
+let step_jalr (i: reg * reg * int32) (s: state) : int32 * int32 =
   let (rd, rs1, imm_i) = i in
+  let pc = s.pc in
   let rd_return = Int32.add pc 4l in
-  let des_pc = Int32.add (reg2ind32 rs1) imm_i in
+  let old_reg_file = s.r in
+  let rs1_val = rf_lookup (reg2ind rs1) old_reg_file in
+  let des_pc = Int32.add rs1_val imm_i in
   (des_pc, rd_return);;
 (*take a register and an offset, return a new register (rd) and a new pc*)
-let step_jal (i: reg * int32) (pc: int32): int32 * int32 = 
+let step_jal (i: reg * int32) (s: state): int32 * int32 = 
   let (rd, imm_j) = i in 
+  let pc = s.pc in
   let rd_return = (Int32.add pc 4l) in
   ((Int32.add pc imm_j), rd_return);;
 
 
-let step_beq (i: reg * reg * int32): int32 =
+let step_beq (i: reg * reg * int32) (s: state): int32 =
   let (rs1, rs2, offset_b) = i in 
-  let rs1_int32 = reg2ind32 rs1 in
-  let rs2_int32 = reg2ind32 rs2 in
+  let old_reg_file = s.r in
+  (* let rs1_int32 = reg2ind32 rs1 in
+  let rs2_int32 = reg2ind32 rs2 in *)
+  let rs1_int32 = rf_lookup (reg2ind rs1) old_reg_file in
+  let rs2_int32 = rf_lookup (reg2ind rs2) old_reg_file in
   if rs1_int32 = rs2_int32 then offset_b else 4l;;
 
-let step_add (i: reg * reg * reg) : int32 =
+let step_add (i: reg * reg * reg) (s: state) : int32 =
   let (_, rs1, rs2) = i in (*(rd, rs1, rs2)*)
-  let rs1_int32 = reg2ind32 rs1 in
-  let rs2_int32 = reg2ind32 rs2 in
+  let old_reg_file = s.r in
+  let rs1_int32 = rf_lookup (reg2ind rs1) old_reg_file in
+  let rs2_int32 = rf_lookup (reg2ind rs2) old_reg_file in
+  (* let rs1_int32 = reg2ind32 rs1 in
+  let rs2_int32 = reg2ind32 rs2 in *)
   Int32.add rs1_int32 rs2_int32;;
 
   (*return register value*)
-let step_ori (i: reg * reg * int32): int32 =
+let step_ori (i: reg * reg * int32) (s: state): int32 =
   let (_, rs1, imm) = i in (*(rd, rs1, imm)*)
-  let rs1_int32 = reg2ind32 rs1 in
+  let old_reg_file = s.r in
+  (* let rs1_int32 = reg2ind32 rs1 in *)
+  let rs1_int32 = rf_lookup (reg2ind rs1) old_reg_file in
   (Int32.logor rs1_int32 imm);;
 
-let step_addi (i: reg * reg * int32): int32 =
+let step_addi (i: reg * reg * int32) (s: state): int32 =
   let (_, rs1, imm) = i in (*(rd, rs1, imm)*)
-  let rs1_int32 = reg2ind32 rs1 in
-  let _ = print_endline ("In addi function check register number: rs1: "^(Int.to_string (reg2ind rs1))) in
-  let _ = print_endline ("In addi function check register value rs1_int32: "^(Printf.sprintf "0x%lx" rs1_int32)) in
- (Int32.add rs1_int32 imm);;
+  let old_rf = s.r in
+  let old_rs1_val = rf_lookup (reg2ind rs1) old_rf in 
+  (* let rs1_int32 = reg2ind32 rs1 in *)
+  (* let _ = print_endline ("In addi function check register number: rs1: "^(Int.to_string (reg2ind rs1))) in
+  let _ = print_endline ("In addi function check register value rs1_int32: "^(Printf.sprintf "0x%lx" rs1_int32)) in *)
+ (Int32.add old_rs1_val imm);;
 
 
 (* Given a starting state, simulate the RISC-V machine code to get a final state;
@@ -209,34 +230,34 @@ let step_addi (i: reg * reg * int32): int32 =
       let _ = print_endline ("next word: "^(Printf.sprintf "0x%lx" nextw)) in
       match i with
       | Add (rd, rs1, rs2) -> 
-        let new_reg_val = step_add (rd, rs1, rs2) in
+        let new_reg_val = step_add (rd, rs1, rs2) (init_state) in
         let _ = print_endline ("In add: new_reg_val: "^(Printf.sprintf "0x%lx" new_reg_val)) in
         let new_reg_file = rf_update (reg2ind rd) new_reg_val old_reg_file in
         let new_state: state = {r=new_reg_file; pc=Int32.add old_pc 4l; m=old_m} in
       interp new_state
       | Ori (rd, rs1, imm) -> 
-        let new_reg_val = step_ori (rd, rs1, imm) in
+        let new_reg_val = step_ori (rd, rs1, imm) (init_state) in
         let new_reg_file = rf_update (reg2ind rd) new_reg_val old_reg_file in
         let new_state: state = {r=new_reg_file; pc=Int32.add old_pc 4l; m=old_m} in
       interp new_state
       | Addi (rd, rs1, imm) ->
         let _ = print_endline ("In addiiiii: check register file: ") in
-        let new_reg_val = step_addi (rd, rs1, imm) in
+        let new_reg_val = step_addi (rd, rs1, imm) (init_state) in
         let new_reg_file = rf_update (reg2ind rd) new_reg_val old_reg_file in
         let _ = print_endline ("In addiiiii: new_reg_val: "^(Printf.sprintf "0x%lx" new_reg_val)) in
         let new_state: state = {r=new_reg_file; pc=Int32.add old_pc 4l; m=old_m} in
       interp new_state
       | Beq (rs1, rs2, offset_b) ->
-        let offset = step_beq (rs1, rs2, offset_b) in
+        let offset = step_beq (rs1, rs2, offset_b) (init_state) in
         let new_state: state = {r=old_reg_file; pc=Int32.add old_pc offset; m=old_m} in
       interp new_state
       | Jal (rd, imm_j) ->
-        let (new_pc, new_rd_val) = step_jal (rd, imm_j) (old_pc) in
+        let (new_pc, new_rd_val) = step_jal (rd, imm_j) (init_state) in
         let new_reg_file = rf_update (reg2ind rd) new_rd_val old_reg_file in
         let new_state: state = {r=new_reg_file; pc=new_pc; m=old_m} in
       interp new_state
       | Jalr (rd, rs1, imm_i) ->
-        let (new_pc, new_rd_val) = step_jalr (rd, rs1, imm_i) (old_pc) in
+        let (new_pc, new_rd_val) = step_jalr (rd, rs1, imm_i) (init_state) in
         let new_reg_file = rf_update (reg2ind rd) new_rd_val old_reg_file in
         let new_state: state = {r=new_reg_file; pc=new_pc; m=old_m} in
       interp new_state
@@ -253,12 +274,12 @@ let step_addi (i: reg * reg * int32): int32 =
         (* let _ = print_endline ("register x1: "^string_of_rf new_state.r) in *)
       interp new_state
       | Lw (rd, rs1, imm_i) ->
-        let new_rd_val = step_lw (rd, rs1, imm_i) (old_m) in
+        let new_rd_val = step_lw (rd, rs1, imm_i) (init_state) in
         let new_reg_file = rf_update (reg2ind rd) new_rd_val old_reg_file in
         let new_state: state = {r=new_reg_file; pc=Int32.add old_pc 4l; m=old_m} in
       interp new_state
       | Sw (rs1, rs2, imm_s) ->
-        let new_m = step_sw (rs1, rs2, imm_s) (old_m) in
+        let new_m = step_sw (rs1, rs2, imm_s) (init_state) in
         let new_state: state = {r=old_reg_file; pc=Int32.add old_pc 4l; m=new_m} in
       interp new_state
       | _ -> raise FatalError
