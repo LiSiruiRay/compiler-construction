@@ -1,0 +1,213 @@
+i_arith
+Hello, world!
+first test register file and memeory---
+memory: 
+4194304 -> 183
+4194305 -> 0
+4194306 -> 0
+4194307 -> 0
+4194308 -> 147
+4194309 -> 128
+4194310 -> 64
+4194311 -> 0
+4194312 -> 51
+4194313 -> 129
+4194314 -> 16
+4194315 -> 0
+end first test register and memeory---
+start of the interp
+check point 2
+start of the interp
+check point 2
+start of the interp
+check point 2
+start of the interp
+after interp
+1 -> 148
+2 -> 2
+4194304 -> 183
+4194305 -> 0
+4194306 -> 0
+4194307 -> 0
+4194308 -> 147
+4194309 -> 128
+4194310 -> 64
+4194311 -> 0
+4194312 -> 51
+4194313 -> 129
+4194314 -> 16
+4194315 -> 0
+0x40000C
+testing register file ...
+[1;31mfailed (expected,got): [0m0x4, 0x94
+[1;31mfailed (expected,got): [0m0x8, 0x2
+testing memory ... 
+0x400000
+0x40000C
+[1;32mPC passed
+[0mi_li
+Hello, world!
+first test register file and memeory---
+memory: 
+4194304 -> 183
+4194305 -> 0
+4194306 -> 238
+4194307 -> 254
+4194308 -> 147
+4194309 -> 128
+4194310 -> 224
+4194311 -> 172
+end first test register and memeory---
+start of the interp
+check point 2
+start of the interp
+check point 2
+start of the interp
+after interp
+1 -> 148
+4194304 -> 183
+4194305 -> 0
+4194306 -> 238
+4194307 -> 254
+4194308 -> 147
+4194309 -> 128
+4194310 -> 224
+4194311 -> 172
+0x400008
+testing register file ...
+[1;31mfailed (expected,got): [0m0xFEEDFACE, 0x94
+testing memory ... 
+0x400000
+0x400008
+[1;32mPC passed
+[0mi_mem
+Hello, world!
+first test register file and memeory---
+memory: 
+4194304 -> 183
+4194305 -> 7
+4194306 -> 0
+4194307 -> 0
+4194308 -> 147
+4194309 -> 135
+4194310 -> 7
+4194311 -> 2
+4194312 -> 35
+4194313 -> 32
+4194314 -> 240
+4194315 -> 16
+4194316 -> 3
+4194317 -> 40
+4194318 -> 0
+4194319 -> 16
+end first test register and memeory---
+start of the interp
+check point 2
+start of the interp
+check point 2
+start of the interp
+check point 2
+start of the interp
+check point 2
+start of the interp
+after interp
+15 -> 1954
+16 -> 0
+256 -> 15
+257 -> 0
+258 -> 0
+259 -> 0
+4194304 -> 183
+4194305 -> 7
+4194306 -> 0
+4194307 -> 0
+4194308 -> 147
+4194309 -> 135
+4194310 -> 7
+4194311 -> 2
+4194312 -> 35
+4194313 -> 32
+4194314 -> 240
+4194315 -> 16
+4194316 -> 3
+4194317 -> 40
+4194318 -> 0
+4194319 -> 16
+0x400010
+testing register file ...
+[1;31mfailed (expected,got): [0m0x20, 0x7A2
+[1;31mfailed (expected,got): [0m0x20, 0x0
+testing memory ... 
+[1;31mfailed (expected,got): [0m0x20, 0xF
+0x400000
+0x400010
+[1;32mPC passed
+[0mi_beqt
+Hello, world!
+first test register file and memeory---
+memory: 
+4194304 -> 99
+4194305 -> 4
+4194306 -> 0
+4194307 -> 0
+end first test register and memeory---
+start of the interp
+check point 2
+start of the interp
+after interp
+4194304 -> 99
+4194305 -> 4
+4194306 -> 0
+4194307 -> 0
+0x400008
+testing register file ...
+testing memory ... 
+0x400000
+0x400008
+[1;32mPC passed
+[0mi_beqf
+Hello, world!
+first test register file and memeory---
+memory: 
+4194304 -> 183
+4194305 -> 0
+4194306 -> 0
+4194307 -> 0
+4194308 -> 147
+4194309 -> 128
+4194310 -> 64
+4194311 -> 0
+4194312 -> 99
+4194313 -> 2
+4194314 -> 16
+4194315 -> 0
+end first test register and memeory---
+start of the interp
+check point 2
+start of the interp
+check point 2
+start of the interp
+check point 2
+start of the interp
+after interp
+1 -> 148
+4194304 -> 183
+4194305 -> 0
+4194306 -> 0
+4194307 -> 0
+4194308 -> 147
+4194309 -> 128
+4194310 -> 64
+4194311 -> 0
+4194312 -> 99
+4194313 -> 2
+4194314 -> 16
+4194315 -> 0
+0x40000C
+testing register file ...
+[1;31mfailed (expected,got): [0m0x4, 0x94
+testing memory ... 
+0x400000
+0x40000C
+[1;32mPC passed
+[0m

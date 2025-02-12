@@ -123,7 +123,9 @@ let instformat2ins (f: instformat) : inst =
 (*Fuse together a list of ints into a word by squeezing them into bit segments*)
 (*We need to mask all numbers to have the right width before squeezing*)
 let combine_bits (bl: (int32*int) list) : int32 (*bits, bit width*) =
+  (* let _ = print_endline "start of combine_bits" in *)
   assert (List.fold_left (+) 0 (List.map snd bl) = 32);
+  (* let _ = print_endline "Finished assert" in *)
   let rec combine_bits_offset (bl': (int32*int) list) (offset:int) : int32 =
     match bl' with
     | (b1,l)::tl -> (Int32.add
@@ -132,8 +134,9 @@ let combine_bits (bl: (int32*int) list) : int32 (*bits, bit width*) =
     )
     | [] -> 0l
   in
+  (* let _ = print_endline "Finished function" in *)
   combine_bits_offset bl 32
-;;
+  ;;
 
 (* Returns an int32 which contains the bits from the interval [lo : hi] from the input i *)
 let bitrange (i : int32) (lo: int) (hi : int) : int32 =
@@ -180,15 +183,15 @@ let instformat_to_string f = match f with
 let inst2str i =
   match i with
     Add (r1,r2,r3) -> "add "^(reg2str r1)^", "^(reg2str r2)^", "^(reg2str r3)^"\n"
-  | Addi (r1,r2,imm) -> "add "^(reg2str r1)^", "^(reg2str r2)^", "^(Int32.to_string imm)^"\n"
-  | Beq (r1,r2,imm) -> "beq "^(reg2str r1)^", "^(reg2str r2)^", "^(Int32.to_string imm)^"\n"
-  | Jal (r, imm) -> "jal "^(reg2str r)^", "^(Int32.to_string imm)^"\n"
-  | Jalr (rd, rs1, imm) -> "jalr "^(reg2str rd)^", "^(reg2str rd)^", "^(Int32.to_string imm)^"\n"
-  | Li (r,imm) -> "li "^(reg2str r)^", "^(Int32.to_string imm)^"\n"
-  | Lui (r,imm) -> "lui "^(reg2str r)^", "^(Int32.to_string imm)^"\n"
-  | Ori (r1,r2,imm) -> "ori "^(reg2str r1)^", "^(reg2str r2)^", "^(Int32.to_string imm)^"\n"
-  | Lw (r1,r2,imm) -> "lw "^(reg2str r1)^", "^(Int32.to_string imm)^"("^(reg2str r2)^")\n"
-  | Sw (r1,r2,imm) -> "sw "^(reg2str r1)^", "^(Int32.to_string imm)^"("^(reg2str r2)^")\n"
+  | Addi (r1,r2,imm) -> "add "^(reg2str r1)^", "^(reg2str r2)^", "^(Printf.sprintf "0x%lx" imm)^"\n"
+  | Beq (r1,r2,imm) -> "beq "^(reg2str r1)^", "^(reg2str r2)^", "^(Printf.sprintf "0x%lx" imm)^"\n"
+  | Jal (r, imm) -> "jal "^(reg2str r)^", "^(Printf.sprintf "0x%lx" imm)^"\n"
+  | Jalr (rd, rs1, imm) -> "jalr "^(reg2str rd)^", "^(reg2str rd)^", "^(Printf.sprintf "0x%lx" imm)^"\n"
+  | Li (r,imm) -> "li "^(reg2str r)^", "^(Printf.sprintf "0x%lx" imm)^"\n"
+  | Lui (r,imm) -> "lui "^(reg2str r)^", "^(Printf.sprintf "0x%lx" imm)^"\n"
+  | Ori (r1,r2,imm) -> "ori "^(reg2str r1)^", "^(reg2str r2)^", "^(Printf.sprintf "0x%lx" imm)^"\n"
+  | Lw (r1,r2,imm) -> "lw "^(reg2str r1)^", "^(Printf.sprintf "0x%lx" imm)^"("^(reg2str r2)^")\n"
+  | Sw (r1,r2,imm) -> "sw "^(reg2str r1)^", "^(Printf.sprintf "0x%lx" imm)^"("^(reg2str r2)^")\n"
 ;;
 
 (*get byte 0,1,2,3 of a word*)

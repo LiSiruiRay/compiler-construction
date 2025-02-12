@@ -86,9 +86,13 @@ let mem_update (a : int32) (v : byte) (m : memory) : memory =
   Int32Map.add a v m
 let mem_lookup (a : int32) (m : memory) : byte =
   try (Int32Map.find a m) with Not_found -> mk_byte Int32.zero
-let string_of_mem (m : memory) : string =
+(* let string_of_mem (m : memory) : string =
   Int32Map.fold (fun key v s ->
-    s^(Int32.to_string key)^" -> "^(Int32.to_string (b2i32 v))^"\n") m ""
+    s^(Int32.to_string key)^" -> "^(Int32.to_string (b2i32 v))^"\n") m "" *)
+    let string_of_mem (m : memory) : string =
+      Int32Map.fold (fun key v s ->
+        s^(Printf.sprintf "0x%lx" key)^" -> "^(Printf.sprintf "0x%lx" (b2i32 v))^"\n"
+      ) m ""
 
 (* State *)
 type state = { r : regfile; pc : int32; m : memory }
