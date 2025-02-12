@@ -57,13 +57,19 @@ let test_pc pc1 pc2 (f,v) =
 let testi str i e1 e2 e3 =
   (try (
   let _ = print_endline str in
+  let _ = print_endline "Hello, world!" in
   let state = assem i in
-  (* let _ = print_string (string_of_rf (state.r)) in
-  let _ = print_string (string_of_mem (state.m)) in *)
+  let _ = print_endline "first test register file and memeory---" in
+  let _ = print_string (string_of_rf (state.r)) in
+  let _ = print_endline "memory: " in
+  let _ = print_string (string_of_mem (state.m)) in
+  let _ = print_endline "end first test register and memeory---" in
   let state' = interp state in
-  (* let _ = print_string (string_of_rf (state'.r)) in
+  let _ = print_endline "after interp" in
+  let _ = print_string (string_of_rf (state'.r)) in
+  
   let _ = print_string (string_of_mem (state'.m)) in
-  let _ = print_string ((tostring state'.pc)^"\n") in *)
+  let _ = print_string ((tostring state'.pc)^"\n") in
   let _ = print_string ("testing register file ...\n") in
   let _ = test_reg state'.r e1 in
   let _ = print_string ("testing memory ... \n") in

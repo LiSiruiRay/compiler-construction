@@ -222,6 +222,11 @@ let rec assem_code (prog : program) (offset : int32)
 ;;
 
 let rec assem (prog : program) : state =
+  (* let _ = print_endline "in assem program..." in
+  let _ = print_endline (string_of_rf init_regfile) in
+  let _ = print_endline (Int32.to_string init_pc) in
+  let _ = print_endline (string_of_mem (assem_code prog init_pc empty_mem)) in
+  let _ = print_endline "end---- assem program..." in *)
   {r=init_regfile;pc=init_pc;m=assem_code prog init_pc empty_mem}
 ;;
 
