@@ -36,6 +36,7 @@ let parse_string s =
 (* Expect 1 command line argument, the file to parse
  * usage: ps2comb [file-to-parse] *)
 let _ = 
+  let _ = print_endline "testing entry" in
   let prog = parse_file() in
   let ans = Eval.eval prog in
   print_string ("answer = "^(string_of_int ans)^"\n")
