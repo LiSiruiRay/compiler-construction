@@ -1,0 +1,136 @@
+start of type_infererence: 
+type_env: []
+e_first: (let rep = (fn x (cons x; (cons x; (nil )))) in (rep (1 )))
+e: (let rep = (fn x (cons x; (cons x; (nil )))) in (rep (1 )))
+
+
+
+ -- case: Let (x, e1, e2), x: rep, 
+e1: (fn x (cons x; (cons x; (nil )))), 
+e2: (rep (1 ))
+
+
+start of type_infererence: 
+type_env: []
+e_first: (fn x (cons x; (cons x; (nil ))))
+e: (fn x (cons x; (cons x; (nil ))))
+
+
+
+ -- case: Fn (x, body), argument (x): x, body: (cons x; (cons x; (nil )))
+arg_type: (Guess)
+checking new_env: [x : (Guess)]
+
+
+start of type_infererence: 
+type_env: [x : (Guess)]
+e_first: (cons x; (cons x; (nil )))
+e: (cons x; (cons x; (nil )))
+
+
+
+ -- case: | PrimApp (prim, args) -> : 
+
+args before call infer again: x; (cons x; (nil ))
+before call infer again, prim: cons
+
+
+start of type_infererence: 
+type_env: [x : (Guess)]
+e_first: x
+e: x
+
+
+
+ -- case: | Var x -> 
+
+
+
+start of type_infererence: 
+type_env: [x : (Guess)]
+e_first: (cons x; (nil ))
+e: (cons x; (nil ))
+
+
+
+ -- case: | PrimApp (prim, args) -> : 
+
+args before call infer again: x; (nil )
+before call infer again, prim: cons
+
+
+start of type_infererence: 
+type_env: [x : (Guess)]
+e_first: x
+e: x
+
+
+
+ -- case: | Var x -> 
+
+
+
+start of type_infererence: 
+type_env: [x : (Guess)]
+e_first: (nil )
+e: (nil )
+
+
+
+ -- case: | PrimApp (prim, args) -> : 
+
+args before call infer again: 
+before call infer again, prim: nil
+after calling: arg_types: 
+end of | PrimApp (prim, args) -> 
+
+
+
+ case: prim_infer: nil
+Arg types: 
+
+in prim_infer case: | Nil, [] ->: 
+
+end. prim_infer case: | Nil, [] ->: 
+after calling: arg_types: (Guess); ((Guess)) list
+end of | PrimApp (prim, args) -> 
+
+
+
+ case: prim_infer: cons
+Arg types: (Guess), ((Guess)) list
+
+in prim_infer case:  Cons, [h; t] -> 
+
+end..in prim_infer case:  Cons, [h; t] -> 
+after calling: arg_types: (Guess); ((Guess)) list
+end of | PrimApp (prim, args) -> 
+
+
+
+ case: prim_infer: cons
+Arg types: (Guess), ((Guess)) list
+
+in prim_infer case:  Cons, [h; t] -> 
+
+end..in prim_infer case:  Cons, [h; t] -> 
+
+Type error
+
+Let y = fun x -> x in (y 5, y true)
+(int, bool)
+
+## instantiate
+Forall(["a"], Arrow_t("a", "a")) -> [("a", g_a)] -> Arrow_t(g_a, g_a)  |||| -> Arrow_t(int, int)
+
+def f(x):
+    def g(y):
+        x += 1
+        print(y)
+
+## generalize
+g_x (x)
+g_x -> g_x (fun x -> x)
+"a" (replace g_x with a tvar, called "a")
+Forall(["a"], Arrow_t("a", "a"))
+
