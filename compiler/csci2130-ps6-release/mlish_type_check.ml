@@ -115,7 +115,7 @@ let instantiate (s:tipe_scheme) : tipe =
     in
     let tc' = generalize_fn tc in
     Forall(List.map snd gs_vs, tc')
-    
+
 let rec norm t =
   match t with
   | Guess_t r ->
@@ -169,31 +169,6 @@ let rec norm t =
       | _ -> 
           (* let _ = print_endline "not reaching type error...." in *)
           type_error "type mismatch")
-
-(* let rec unify (t1:tipe) (t2:tipe) : unit =
-  let _ = print_endline ("in the let rec unify: checking type: \nt1: "^(tipe2string t1)^"\nt2: "^(tipe2string t2)) in
-  match t1, t2 with
-  | Int_t, Int_t | Bool_t, Bool_t | Unit_t, Unit_t -> ()
-
-  | Fn_t (a1, b1), Fn_t (a2, b2) ->
-      unify a1 a2; unify b1 b2
-  | Pair_t (a1, b1), Pair_t (a2, b2) ->
-      unify a1 a2; unify b1 b2
-  | List_t t1, List_t t2 -> unify t1 t2
-
-  | Guess_t ({contents = None} as r), t 
-  | t, Guess_t ({contents = None} as r) -> 
-    let _ = print_endline ("checking t, Guess_t ({contents = None} as r) ->: checking type: \nt: "^(tipe2string t)) in
-      if check_occurs r t then type_error "occurs check failed" else r := Some t
-
-  | Guess_t ({contents = Some t1'}), t2 -> unify t1' t2
-  | t1, Guess_t({contents = Some t2'}) -> unify t1 t2'
-
-  | Tvar_t a, Tvar_t b when a = b -> ()
- 
-  | _ -> 
-    let _ = print_endline "not reaching type error...." in
-    type_error "type mismatch" *)
 
   and check_occurs r t = 
     match t with
