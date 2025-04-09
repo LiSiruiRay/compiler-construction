@@ -27,7 +27,7 @@ let minus xs ys =
   
 
 let rec guesses_of_tipe (t:tipe) : tipe list = 
-  let _= print_endline ("start of guesses_of_tipe: t: " ^ (tipe2string t)) in
+  (* let _= print_endline ("start of guesses_of_tipe: t: " ^ (tipe2string t)) in *)
   match t with 
   | Guess_t({contents=None}) -> [t]
   | Guess_t({contents=Some t'}) -> guesses_of_tipe t'
@@ -115,13 +115,14 @@ let instantiate (s:tipe_scheme) : tipe =
     in
     let tc' = generalize_fn tc in
     Forall(List.map snd gs_vs, tc')
-    let rec norm t =
-      match t with
-      | Guess_t r ->
-          (match !r with
-           | Some t' -> norm t'
-           | None -> t)
-      | _ -> t
+    
+let rec norm t =
+  match t with
+  | Guess_t r ->
+      (match !r with
+        | Some t' -> norm t'
+        | None -> t)
+  | _ -> t
       let rec is_equal t1 t2 =
         let t1 = norm t1 in
         let t2 = norm t2 in
@@ -204,8 +205,8 @@ let instantiate (s:tipe_scheme) : tipe =
     | _ -> false
 
 let prim_infer (p : prim) (arg_types : tipe list) : tipe =
-  let _ = print_endline ("\n\n\n case: prim_infer: " ^ prim2string p) in
-  let _ = print_endline ("Arg types: " ^ String.concat ", " (List.map tipe2string arg_types)) in
+  (* let _ = print_endline ("\n\n\n case: prim_infer: " ^ prim2string p) in *)
+  (* let _ = print_endline ("Arg types: " ^ String.concat ", " (List.map tipe2string arg_types)) in *)
 
   match p, arg_types with
   | Plus, [t1; t2]
@@ -229,16 +230,16 @@ let prim_infer (p : prim) (arg_types : tipe list) : tipe =
       unify t (Pair_t(a, b)); b
 
       | Nil, [] ->
-        let _ = print_endline ("\nin prim_infer case: | Nil, [] ->: ") in
+        (* let _ = print_endline ("\nin prim_infer case: | Nil, [] ->: ") in *)
         (* Create a new guess variable for the element type *)
         let elem_type = Guess_t (ref None) in
-        let _ = print_endline ("\nend. prim_infer case: | Nil, [] ->: ") in
+        (* let _ = print_endline ("\nend. prim_infer case: | Nil, [] ->: ") in *)
         List_t elem_type
 
   (* | Cons, [h; t] ->
       unify t (List_t h); List_t h *)
       | Cons, [h; t] ->
-        let _ = print_endline ("\nin prim_infer case:  Cons, [h; t] -> ") in
+        (* let _ = print_endline ("\nin prim_infer case:  Cons, [h; t] -> ") in *)
         let elem_type = 
           match t with
           | List_t(Guess_t {contents=None}) -> 
@@ -246,7 +247,7 @@ let prim_infer (p : prim) (arg_types : tipe list) : tipe =
           | List_t(elem) -> elem 
           | _ -> Guess_t(ref None)
         in
-        let _ = print_endline ("\nend..in prim_infer case:  Cons, [h; t] -> ") in
+        (* let _ = print_endline ("\nend..in prim_infer case:  Cons, [h; t] -> ") in *)
         unify h elem_type;
         unify t (List_t elem_type);
         List_t elem_type
@@ -273,43 +274,43 @@ let prim_infer (p : prim) (arg_types : tipe list) : tipe =
 
 let rec type_infererence (env:type_env) (e_first :exp) : tipe =
   let (e,_) = e_first in
-  let _ = print_endline "\n\nstart of type_infererence: " in
-  let _ = print_endline ("type_env: "^(type_env2string env)) in
-  let _ = print_endline ("e_first: "^(exp2string e_first)) in
-  let _ = print_endline ("e: "^(rexp2string e)) in
+  (* let _ = print_endline "\n\nstart of type_infererence: " in *)
+  (* let _ = print_endline ("type_env: "^(type_env2string env)) in *)
+  (* let _ = print_endline ("e_first: "^(exp2string e_first)) in *)
+  (* let _ = print_endline ("e: "^(rexp2string e)) in *)
   match e with
   | Var x ->
-    let _ = print_endline ("\n\n\n -- case: | Var x -> \n") in
+    (* let _ = print_endline ("\n\n\n -- case: | Var x -> \n") in *)
     (try instantiate (List.assoc x env)
       with Not_found -> type_error ("unbound variable "^x))
 
   | PrimApp (prim, args) -> 
-    let _ = print_endline ("\n\n\n -- case: | PrimApp (prim, args) -> : \n") in
+    (* let _ = print_endline ("\n\n\n -- case: | PrimApp (prim, args) -> : \n") in *)
 
-    let _ = print_endline ("args before call infer again: "^(exps2string args)) in
-    let _ = print_endline ("before call infer again, prim: "^(prim2string prim)) in
+    (* let _ = print_endline ("args before call infer again: "^(exps2string args)) in *)
+    (* let _ = print_endline ("before call infer again, prim: "^(prim2string prim)) in *)
     let mapping_func = type_infererence env in
     let arg_types = List.map mapping_func args in
     
-    let _ = print_endline ("after calling: arg_types: "^(String.concat "; " (List.map tipe2string arg_types))) in
-    let _ = print_endline ("end of | PrimApp (prim, args) -> ") in
+    (* let _ = print_endline ("after calling: arg_types: "^(String.concat "; " (List.map tipe2string arg_types))) in *)
+    (* let _ = print_endline ("end of | PrimApp (prim, args) -> ") in *)
     prim_infer prim arg_types
 
   | Fn (x, body) ->
-    let _ = print_endline ("\n\n\n -- case: Fn (x, body), argument (x): "^(x)^", body: "^(exp2string body) )in
+    (* let _ = print_endline ("\n\n\n -- case: Fn (x, body), argument (x): "^(x)^", body: "^(exp2string body) )in *)
     let arg_type = Guess_t (ref None) in
-    let _ = print_endline ("arg_type: "^(tipe2string arg_type) )in
+    (* let _ = print_endline ("arg_type: "^(tipe2string arg_type) )in *)
     let new_env = ((x, Forall([], arg_type)) :: env) in
-    let _ = print_endline ("checking new_env: " ^ (type_env2string new_env)) in
+    (* let _ = print_endline ("checking new_env: " ^ (type_env2string new_env)) in *)
     let body_type = type_infererence new_env body in (*problem happened*)
-    let _ = print_endline ("body_type: "^(tipe2string body_type) )in
-    let _ = print_endline ("end of Fn Case ---- \n\n\n ") in
+    (* let _ = print_endline ("body_type: "^(tipe2string body_type) )in *)
+    (* let _ = print_endline ("end of Fn Case ---- \n\n\n ") in *)
     Fn_t (arg_type, body_type)
     
 
 
   | App (e1, e2) ->
-    let _ = print_endline ("\n\n\n -- case: App (e1, e2), "^"\ne1: "^(exp2string e1)^"\ne2: "^(exp2string e2))in
+    (* let _ = print_endline ("\n\n\n -- case: App (e1, e2), "^"\ne1: "^(exp2string e1)^"\ne2: "^(exp2string e2))in *)
     let t1 = type_infererence env e1 in
     let t2 = type_infererence env e2 in
     
@@ -320,19 +321,19 @@ let rec type_infererence (env:type_env) (e_first :exp) : tipe =
     result
 
   | If (cond, e1, e2) ->
-    let _ = print_endline ("\n\n\n -- case: If (cond, e1, e2)") in
+    (* let _ = print_endline ("\n\n\n -- case: If (cond, e1, e2)") in *)
     unify (type_infererence env cond) Bool_t;
     let t1 = type_infererence env e1 in
     unify t1 (type_infererence env e2);
     t1
 
   | Let (x, e1, e2) ->
-    let _ = print_endline ("\n\n\n -- case: Let (x, e1, e2), x: "^(x)^", \ne1: "^(exp2string e1)^", \ne2: "^(exp2string e2) )in
+    (* let _ = print_endline ("\n\n\n -- case: Let (x, e1, e2), x: "^(x)^", \ne1: "^(exp2string e1)^", \ne2: "^(exp2string e2) )in *)
     let t1 = type_infererence env e1 in
-    let _ = print_endline ("checking type, t1: "^(tipe2string t1))in
+    (* let _ = print_endline ("checking type, t1: "^(tipe2string t1))in *)
     let scheme = generalize env t1 in
-    let _ = print_endline ("checking tipe_scheme2string, scheme: "^(tipe_scheme2string scheme))in
-    let _ = print_endline "end of let case" in
+    (* let _ = print_endline ("checking tipe_scheme2string, scheme: "^(tipe_scheme2string scheme))in *)
+    (* let _ = print_endline "end of let case" in *)
     type_infererence ((x, scheme) :: env) e2
 
 
