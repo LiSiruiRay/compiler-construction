@@ -104,7 +104,7 @@ let instantiate (s:tipe_scheme) : tipe =
     ) diff in
     let tc = subst_guess gs_vs t in
     (* Special handling for function types to ensure argument polymorphism *)
-    let rec generalize_fn t = match t with
+    (* let rec generalize_fn t = match t with
       | Fn_t(t1, t2) -> 
         let t1' = match t1 with
           | Guess_t({contents=None}) -> Tvar_t(freshvar())
@@ -113,8 +113,8 @@ let instantiate (s:tipe_scheme) : tipe =
         Fn_t(t1', generalize_fn t2)
       | _ -> t
     in
-    let tc' = generalize_fn tc in
-    Forall(List.map snd gs_vs, tc')
+    let tc' = generalize_fn tc in *)
+    Forall(List.map snd gs_vs, tc)
 
 let rec norm t =
   match t with
@@ -144,7 +144,7 @@ let rec norm t =
         | _ -> false
 
     let rec unify (t1:tipe) (t2:tipe) : unit =
-      (* let _ = print_endline ("in the let rec unify: checking type: \nt1: "^(tipe2string t1)^"\nt2: "^(tipe2string t2)) in *)
+      let _ = print_endline ("in the let rec unify: checking type: \nt1: "^(tipe2string t1)^"\nt2: "^(tipe2string t2)) in
       if is_equal t1 t2 then () else
       (match t1, t2 with
       | Int_t, Int_t | Bool_t, Bool_t | Unit_t, Unit_t -> ()
@@ -249,10 +249,10 @@ let prim_infer (p : prim) (arg_types : tipe list) : tipe =
 
 let rec type_infererence (env:type_env) (e_first :exp) : tipe =
   let (e,_) = e_first in
-  (* let _ = print_endline "\n\nstart of type_infererence: " in *)
-  (* let _ = print_endline ("type_env: "^(type_env2string env)) in *)
-  (* let _ = print_endline ("e_first: "^(exp2string e_first)) in *)
-  (* let _ = print_endline ("e: "^(rexp2string e)) in *)
+  let _ = print_endline "\n\nstart of type_infererence: " in
+  let _ = print_endline ("type_env: "^(type_env2string env)) in
+  let _ = print_endline ("e_first: "^(exp2string e_first)) in
+  let _ = print_endline ("e: "^(rexp2string e)) in
   match e with
   | Var x ->
     (* let _ = print_endline ("\n\n\n -- case: | Var x -> \n") in *)
@@ -296,9 +296,10 @@ let rec type_infererence (env:type_env) (e_first :exp) : tipe =
     result
 
   | If (cond, e1, e2) ->
-    (* let _ = print_endline ("\n\n\n -- case: If (cond, e1, e2)") in *)
+    let _ = print_endline ("\n\n\n -- case: If (cond, e1, e2)") in
     unify (type_infererence env cond) Bool_t;
     let t1 = type_infererence env e1 in
+    let _ = print_endline ("checking point") in
     unify t1 (type_infererence env e2);
     t1
 
