@@ -126,13 +126,19 @@ let instantiate (s:tipe_scheme) : tipe =
       | Pair_t (a1, b1), Pair_t (a2, b2) ->
           unify a1 a2; unify b1 b2
       | List_t t1, List_t t2 -> unify t1 t2
-    
-      | Guess_t ({contents = None} as r), t 
-      | t, Guess_t ({contents = None} as r) -> 
-          if check_occurs r t then type_error "occurs check failed" else r := Some t
-    
+
       | Guess_t ({contents = Some t1'}), t2 -> unify t1' t2
-      | t1, Guess_t({contents = Some t2'}) -> unify t1 t2'
+    
+      | Guess_t ({contents = None} as r), t ->
+        if check_occurs r t then type_error "occurs check failed" else r := Some t
+      
+      | _, Guess_t (_) -> unify t2 t1
+
+      (* | t, Guess_t ({contents = None} as r) -> 
+          
+    
+      
+      | t1, Guess_t({contents = Some t2'}) -> unify t1 t2' *)
     
       | Tvar_t a, Tvar_t b when a = b -> ()
       
