@@ -115,10 +115,37 @@ let instantiate (s:tipe_scheme) : tipe =
     in
     let tc' = generalize_fn tc in
     Forall(List.map snd gs_vs, tc')
+    let rec norm t =
+      match t with
+      | Guess_t r ->
+          (match !r with
+           | Some t' -> norm t'
+           | None -> t)
+      | _ -> t
+      let rec is_equal t1 t2 =
+        let t1 = norm t1 in
+        let t2 = norm t2 in
+        match t1, t2 with
+        | Int_t, Int_t -> true
+        | Bool_t, Bool_t -> true
+        | Unit_t, Unit_t -> true
+        | Tvar_t v1, Tvar_t v2 -> v1 = v2
+        | Fn_t (a1, b1), Fn_t (a2, b2) ->
+            is_equal a1 a2 && is_equal b1 b2
+        | Pair_t (a1, b1), Pair_t (a2, b2) ->
+            is_equal a1 a2 && is_equal b1 b2
+        | List_t t1, List_t t2 ->
+            is_equal t1 t2
+        | Guess_t r1, Guess_t r2 ->
+            (* When both guesses are undetermined (i.e. not resolved),
+               we compare the physical identity of the references. *)
+            r1 == r2
+        | _ -> false
 
     let rec unify (t1:tipe) (t2:tipe) : unit =
       (* let _ = print_endline ("in the let rec unify: checking type: \nt1: "^(tipe2string t1)^"\nt2: "^(tipe2string t2)) in *)
-      match t1, t2 with
+      if is_equal t1 t2 then () else
+      (match t1, t2 with
       | Int_t, Int_t | Bool_t, Bool_t | Unit_t, Unit_t -> ()
     
       | Fn_t (a1, b1), Fn_t (a2, b2) ->
@@ -133,12 +160,6 @@ let instantiate (s:tipe_scheme) : tipe =
         if check_occurs r t then type_error "occurs check failed" else r := Some t
       
       | _, Guess_t (_) -> unify t2 t1
-
-      (* | t, Guess_t ({contents = None} as r) -> 
-          
-    
-      
-      | t1, Guess_t({contents = Some t2'}) -> unify t1 t2' *)
     
       | Tvar_t a, Tvar_t b when a = b -> ()
       
@@ -146,7 +167,7 @@ let instantiate (s:tipe_scheme) : tipe =
     
       | _ -> 
           (* let _ = print_endline "not reaching type error...." in *)
-          type_error "type mismatch"
+          type_error "type mismatch")
 
 (* let rec unify (t1:tipe) (t2:tipe) : unit =
   let _ = print_endline ("in the let rec unify: checking type: \nt1: "^(tipe2string t1)^"\nt2: "^(tipe2string t2)) in
