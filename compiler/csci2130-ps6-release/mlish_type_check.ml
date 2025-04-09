@@ -18,6 +18,7 @@ let freshvar () : tvar =
   freshvar_counter := v + 1;
   "a" ^ string_of_int v
 
+  (*Set Union*)
 let union xs ys = 
   List.fold_left (fun acc x -> if List.mem x acc then acc else x::acc) ys xs
 
@@ -25,15 +26,16 @@ let minus xs ys =
   List.filter (fun x -> not (List.exists (fun y -> x == y) ys)) xs
   
 
-let rec guess_of_tipe (t:tipe) : tipe list = 
+let rec guesses_of_tipe (t:tipe) : tipe list = 
+  let _= print_endline ("start of guesses_of_tipe: t: " ^ (tipe2string t))
   match t with 
   | Guess_t({contents=None}) -> [t]
-  | Guess_t({contents=Some t'}) -> guess_of_tipe t'
-  | Fn_t(t1,t2) | Pair_t(t1, t2) -> union (guess_of_tipe t1) (guess_of_tipe t2)
-  | List_t(t1) -> guess_of_tipe t1
+  | Guess_t({contents=Some t'}) -> guesses_of_tipe t'
+  | Fn_t(t1,t2) | Pair_t(t1, t2) -> union (guesses_of_tipe t1) (guesses_of_tipe t2)
+  | List_t(t1) -> guesses_of_tipe t1
   | _ -> []
 
-let guesses_of_scheme (Forall(_,t)) = guess_of_tipe t
+let guesses_of_scheme (Forall(_,t)) = guesses_of_tipe t
 
 let guesses_of_env (env:type_env): tipe list = 
   List.fold_left(fun acc (_,s) -> union (guesses_of_scheme s) acc) [] env
@@ -62,7 +64,7 @@ let instantiate (s:tipe_scheme) : tipe =
     in inst t
 
 (* let generalize (env:type_env) (t:tipe) : tipe_scheme = 
-  let t_gs = guess_of_tipe t in 
+  let t_gs = guesses_of_tipe t in 
   let env_gs = guesses_of_env env in
   let diff = minus t_gs env_gs in
   let gs_vs = List.map (function
@@ -74,7 +76,7 @@ let instantiate (s:tipe_scheme) : tipe =
   Forall(List.map snd gs_vs, tc)  *)
 
   let generalize (env:type_env) (t:tipe) : tipe_scheme = 
-    let t_gs = guess_of_tipe t in 
+    let t_gs = guesses_of_tipe t in 
     let env_gs = guesses_of_env env in
     let diff = minus t_gs env_gs in
     let gs_vs = List.map (function
