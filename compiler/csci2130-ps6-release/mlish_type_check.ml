@@ -27,7 +27,7 @@ let minus xs ys =
   
 
 let rec guesses_of_tipe (t:tipe) : tipe list = 
-  let _= print_endline ("start of guesses_of_tipe: t: " ^ (tipe2string t))
+  let _= print_endline ("start of guesses_of_tipe: t: " ^ (tipe2string t)) in
   match t with 
   | Guess_t({contents=None}) -> [t]
   | Guess_t({contents=Some t'}) -> guesses_of_tipe t'
@@ -40,6 +40,22 @@ let guesses_of_scheme (Forall(_,t)) = guesses_of_tipe t
 let guesses_of_env (env:type_env): tipe list = 
   List.fold_left(fun acc (_,s) -> union (guesses_of_scheme s) acc) [] env
 
+(* substitute : (tvar * tipe) list * tipe -> tipe *)
+let rec substitute (subs, t) =
+  match t with
+  | Int_t | Bool_t | Unit_t -> t
+  | Tvar_t v ->
+      (try List.assoc v subs with Not_found -> Tvar_t v)
+  | Fn_t (t1, t2) ->
+      Fn_t (substitute (subs, t1), substitute (subs, t2))
+  | Pair_t (t1, t2) ->
+      Pair_t (substitute (subs, t1), substitute (subs, t2))
+  | List_t t' ->
+      List_t (substitute (subs, t'))
+  | Guess_t r ->
+      (match !r with
+       | Some t' -> substitute (subs, t')
+       | None -> Guess_t r)
 let rec subst_guess (subs:((tipe option ref) * tvar) list)(t:tipe) : tipe = 
   match t with 
   | Guess_t({contents=None} as g) -> 
@@ -52,16 +68,19 @@ let rec subst_guess (subs:((tipe option ref) * tvar) list)(t:tipe) : tipe =
 
 let instantiate (s:tipe_scheme) : tipe = 
   match s with 
-  | Forall(vs, t) -> 
+  | Forall (vs, t) when vs <> [] ->
     let b = List.map (fun a -> (a, Guess_t(ref None))) vs in
-    let rec inst t = match t with 
+    substitute (b, t)
+    (* let rec inst t = match t with 
       | Tvar_t v -> (try List.assoc v b with Not_found -> t)
       | Fn_t(t1, t2) -> Fn_t(inst t1, inst t2)
       | Pair_t(t1, t2) -> Pair_t(inst t1, inst t2)
       | List_t t1 -> List_t(inst t1)
       | Guess_t tr -> (match !tr with None -> t | Some t' -> inst t')
       | _ -> t
-    in inst t
+    in inst t *)
+  | Forall ([], t) -> t
+  | _ -> failwith "probem happened in the instantiate"
 
 (* let generalize (env:type_env) (t:tipe) : tipe_scheme = 
   let t_gs = guesses_of_tipe t in 

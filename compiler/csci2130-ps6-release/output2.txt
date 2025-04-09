@@ -1,42 +1,115 @@
-start of type_infererence: 
-type_env: []
-e_first: (let rep = (fn x (cons x; (cons x; (nil )))) in (rep (1 )))
-e: (let rep = (fn x (cons x; (cons x; (nil )))) in (rep (1 )))
-
-
-
- -- case: Let (x, e1, e2), x: rep, 
-e1: (fn x (cons x; (cons x; (nil )))), 
-e2: (rep (1 ))
 
 
 start of type_infererence: 
 type_env: []
-e_first: (fn x (cons x; (cons x; (nil ))))
-e: (fn x (cons x; (cons x; (nil ))))
+e_first: ((fn y (let x = (fn z y) in (pair ((x (1 )) (1 )); ((x (pair (1 ); (2 ))) (2 ))))) (fn x x))
+e: ((fn y (let x = (fn z y) in (pair ((x (1 )) (1 )); ((x (pair (1 ); (2 ))) (2 ))))) (fn x x))
 
 
 
- -- case: Fn (x, body), argument (x): x, body: (cons x; (cons x; (nil )))
+ -- case: App (e1, e2), 
+e1: (fn y (let x = (fn z y) in (pair ((x (1 )) (1 )); ((x (pair (1 ); (2 ))) (2 )))))
+e2: (fn x x)
+
+
+start of type_infererence: 
+type_env: []
+e_first: (fn y (let x = (fn z y) in (pair ((x (1 )) (1 )); ((x (pair (1 ); (2 ))) (2 )))))
+e: (fn y (let x = (fn z y) in (pair ((x (1 )) (1 )); ((x (pair (1 ); (2 ))) (2 )))))
+
+
+
+ -- case: Fn (x, body), argument (x): y, body: (let x = (fn z y) in (pair ((x (1 )) (1 )); ((x (pair (1 ); (2 ))) (2 ))))
 arg_type: (Guess)
-checking new_env: [x : (Guess)]
+checking new_env: [y : (Guess)]
 
 
 start of type_infererence: 
-type_env: [x : (Guess)]
-e_first: (cons x; (cons x; (nil )))
-e: (cons x; (cons x; (nil )))
+type_env: [y : (Guess)]
+e_first: (let x = (fn z y) in (pair ((x (1 )) (1 )); ((x (pair (1 ); (2 ))) (2 ))))
+e: (let x = (fn z y) in (pair ((x (1 )) (1 )); ((x (pair (1 ); (2 ))) (2 ))))
+
+
+
+ -- case: Let (x, e1, e2), x: x, 
+e1: (fn z y), 
+e2: (pair ((x (1 )) (1 )); ((x (pair (1 ); (2 ))) (2 )))
+
+
+start of type_infererence: 
+type_env: [y : (Guess)]
+e_first: (fn z y)
+e: (fn z y)
+
+
+
+ -- case: Fn (x, body), argument (x): z, body: y
+arg_type: (Guess)
+checking new_env: [z : (Guess); y : (Guess)]
+
+
+start of type_infererence: 
+type_env: [z : (Guess); y : (Guess)]
+e_first: y
+e: y
+
+
+
+ -- case: | Var x -> 
+
+body_type: (Guess)
+end of Fn Case ---- 
+
+
+ 
+checking type, t1: ((Guess)) -> ((Guess))
+start of guesses_of_tipe: t: ((Guess)) -> ((Guess))
+start of guesses_of_tipe: t: (Guess)
+start of guesses_of_tipe: t: (Guess)
+start of guesses_of_tipe: t: (Guess)
+checking tipe_scheme2string, scheme: ('a0) -> ((Guess))
+end of let case
+
+
+start of type_infererence: 
+type_env: [x : ('a0) -> ((Guess)); y : (Guess)]
+e_first: (pair ((x (1 )) (1 )); ((x (pair (1 ); (2 ))) (2 )))
+e: (pair ((x (1 )) (1 )); ((x (pair (1 ); (2 ))) (2 )))
 
 
 
  -- case: | PrimApp (prim, args) -> : 
 
-args before call infer again: x; (cons x; (nil ))
-before call infer again, prim: cons
+args before call infer again: ((x (1 )) (1 )); ((x (pair (1 ); (2 ))) (2 ))
+before call infer again, prim: pair
 
 
 start of type_infererence: 
-type_env: [x : (Guess)]
+type_env: [x : ('a0) -> ((Guess)); y : (Guess)]
+e_first: ((x (1 )) (1 ))
+e: ((x (1 )) (1 ))
+
+
+
+ -- case: App (e1, e2), 
+e1: (x (1 ))
+e2: (1 )
+
+
+start of type_infererence: 
+type_env: [x : ('a0) -> ((Guess)); y : (Guess)]
+e_first: (x (1 ))
+e: (x (1 ))
+
+
+
+ -- case: App (e1, e2), 
+e1: x
+e2: (1 )
+
+
+start of type_infererence: 
+type_env: [x : ('a0) -> ((Guess)); y : (Guess)]
 e_first: x
 e: x
 
@@ -47,90 +120,196 @@ e: x
 
 
 start of type_infererence: 
-type_env: [x : (Guess)]
-e_first: (cons x; (nil ))
-e: (cons x; (nil ))
-
-
-
- -- case: | PrimApp (prim, args) -> : 
-
-args before call infer again: x; (nil )
-before call infer again, prim: cons
-
-
-start of type_infererence: 
-type_env: [x : (Guess)]
-e_first: x
-e: x
-
-
-
- -- case: | Var x -> 
-
-
-
-start of type_infererence: 
-type_env: [x : (Guess)]
-e_first: (nil )
-e: (nil )
+type_env: [x : ('a0) -> ((Guess)); y : (Guess)]
+e_first: (1 )
+e: (1 )
 
 
 
  -- case: | PrimApp (prim, args) -> : 
 
 args before call infer again: 
-before call infer again, prim: nil
+before call infer again, prim: 1
 after calling: arg_types: 
 end of | PrimApp (prim, args) -> 
 
 
 
- case: prim_infer: nil
+ case: prim_infer: 1
 Arg types: 
 
-in prim_infer case: | Nil, [] ->: 
 
-end. prim_infer case: | Nil, [] ->: 
-after calling: arg_types: (Guess); ((Guess)) list
+start of type_infererence: 
+type_env: [x : ('a0) -> ((Guess)); y : (Guess)]
+e_first: (1 )
+e: (1 )
+
+
+
+ -- case: | PrimApp (prim, args) -> : 
+
+args before call infer again: 
+before call infer again, prim: 1
+after calling: arg_types: 
 end of | PrimApp (prim, args) -> 
 
 
 
- case: prim_infer: cons
-Arg types: (Guess), ((Guess)) list
+ case: prim_infer: 1
+Arg types: 
 
-in prim_infer case:  Cons, [h; t] -> 
 
-end..in prim_infer case:  Cons, [h; t] -> 
-after calling: arg_types: (Guess); ((Guess)) list
+start of type_infererence: 
+type_env: [x : ('a0) -> ((int) -> ((Guess))); y : (int) -> ((Guess))]
+e_first: ((x (pair (1 ); (2 ))) (2 ))
+e: ((x (pair (1 ); (2 ))) (2 ))
+
+
+
+ -- case: App (e1, e2), 
+e1: (x (pair (1 ); (2 )))
+e2: (2 )
+
+
+start of type_infererence: 
+type_env: [x : ('a0) -> ((int) -> ((Guess))); y : (int) -> ((Guess))]
+e_first: (x (pair (1 ); (2 )))
+e: (x (pair (1 ); (2 )))
+
+
+
+ -- case: App (e1, e2), 
+e1: x
+e2: (pair (1 ); (2 ))
+
+
+start of type_infererence: 
+type_env: [x : ('a0) -> ((int) -> ((Guess))); y : (int) -> ((Guess))]
+e_first: x
+e: x
+
+
+
+ -- case: | Var x -> 
+
+
+
+start of type_infererence: 
+type_env: [x : ('a0) -> ((int) -> ((Guess))); y : (int) -> ((Guess))]
+e_first: (pair (1 ); (2 ))
+e: (pair (1 ); (2 ))
+
+
+
+ -- case: | PrimApp (prim, args) -> : 
+
+args before call infer again: (1 ); (2 )
+before call infer again, prim: pair
+
+
+start of type_infererence: 
+type_env: [x : ('a0) -> ((int) -> ((Guess))); y : (int) -> ((Guess))]
+e_first: (1 )
+e: (1 )
+
+
+
+ -- case: | PrimApp (prim, args) -> : 
+
+args before call infer again: 
+before call infer again, prim: 1
+after calling: arg_types: 
 end of | PrimApp (prim, args) -> 
 
 
 
- case: prim_infer: cons
-Arg types: (Guess), ((Guess)) list
+ case: prim_infer: 1
+Arg types: 
 
-in prim_infer case:  Cons, [h; t] -> 
 
-end..in prim_infer case:  Cons, [h; t] -> 
+start of type_infererence: 
+type_env: [x : ('a0) -> ((int) -> ((Guess))); y : (int) -> ((Guess))]
+e_first: (2 )
+e: (2 )
 
-Type error
 
-Let y = fun x -> x in (y 5, y true)
-(int, bool)
 
-## instantiate
-Forall(["a"], Arrow_t("a", "a")) -> [("a", g_a)] -> Arrow_t(g_a, g_a)  |||| -> Arrow_t(int, int)
+ -- case: | PrimApp (prim, args) -> : 
 
-def f(x):
-    def g(y):
-        x += 1
-        print(y)
+args before call infer again: 
+before call infer again, prim: 2
+after calling: arg_types: 
+end of | PrimApp (prim, args) -> 
 
-## generalize
-g_x (x)
-g_x -> g_x (fun x -> x)
-"a" (replace g_x with a tvar, called "a")
-Forall(["a"], Arrow_t("a", "a"))
 
+
+ case: prim_infer: 2
+Arg types: 
+after calling: arg_types: int; int
+end of | PrimApp (prim, args) -> 
+
+
+
+ case: prim_infer: pair
+Arg types: int, int
+
+
+start of type_infererence: 
+type_env: [x : ('a0) -> ((int) -> ((Guess))); y : (int) -> ((Guess))]
+e_first: (2 )
+e: (2 )
+
+
+
+ -- case: | PrimApp (prim, args) -> : 
+
+args before call infer again: 
+before call infer again, prim: 2
+after calling: arg_types: 
+end of | PrimApp (prim, args) -> 
+
+
+
+ case: prim_infer: 2
+Arg types: 
+after calling: arg_types: (Guess); (Guess)
+end of | PrimApp (prim, args) -> 
+
+
+
+ case: prim_infer: pair
+Arg types: (Guess), (Guess)
+body_type: ((Guess)) * ((Guess))
+end of Fn Case ---- 
+
+
+ 
+
+
+start of type_infererence: 
+type_env: []
+e_first: (fn x x)
+e: (fn x x)
+
+
+
+ -- case: Fn (x, body), argument (x): x, body: x
+arg_type: (Guess)
+checking new_env: [x : (Guess)]
+
+
+start of type_infererence: 
+type_env: [x : (Guess)]
+e_first: x
+e: x
+
+
+
+ -- case: | Var x -> 
+
+body_type: (Guess)
+end of Fn Case ---- 
+
+
+ 
+(int) * (int)
